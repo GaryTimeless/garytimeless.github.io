@@ -1,8 +1,0 @@
-{
-  "name": "FitCom",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue-vite",
-  "id": "227411a4"
-}
