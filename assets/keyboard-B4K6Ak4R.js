@@ -1,4 +1,4 @@
-import{w as t}from"./index-6zEvlDCR.js";/*!
+import{w as t}from"./index-CAds93eS.js";/*!
  * (C) Ionic http://ionicframework.com - MIT License
  */const r=()=>{if(t!==void 0)return t.Capacitor};/*!
  * (C) Ionic http://ionicframework.com - MIT License
