@@ -1,0 +1,95 @@
+:root {
+  color-scheme: dark;
+  --page: #111e2c;
+  --panel: #192b3e;
+  --line: #42576b;
+  --text: #fbf5e7;
+  --muted: #bdd0df;
+  --gold: #f1c776;
+  font: 1rem/1.45 "Aptos", "Trebuchet MS", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--page); color: var(--text); }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; min-height: 44px; }
+button:disabled { cursor: default; opacity: .55; }
+button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+a { color: inherit; }
+.top {
+  min-height: 67px;
+  padding: .75rem clamp(1rem, 3vw, 2.75rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+.brand { text-decoration: none; display: flex; align-items: center; gap: .6rem; font-weight: 700; }
+.brand-mark {
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.jump { color: var(--muted); font-size: .9rem; text-underline-offset: 4px; }
+.atlas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 28rem); min-height: calc(100svh - 67px); }
+.map-panel { position: relative; min-height: 625px; isolation: isolate; }
+#map { background: #a3b4c0; position: absolute; inset: 0; }
+.leaflet-tile-pane { filter: saturate(.72); }
+.fog { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 450; }
+.map-controls, .legend {
+  position: absolute;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+.map-controls { top: .75rem; right: .75rem; flex-wrap: wrap; justify-content: end; left: 3.35rem; pointer-events: none; }
+.map-controls button { pointer-events: auto; background: var(--page); }
+.legend {
+  left: .8rem;
+  bottom: 1.75rem;
+  background: var(--page);
+  border: 1px solid var(--line);
+  padding: .36rem .65rem;
+  border-radius: .4rem;
+  font-size: .76rem;
+}
+.legend span { width: 1.1rem; border-top: 3px solid var(--gold); }
+.sidebar { padding: clamp(1.25rem, 3.2vw, 3rem); background: var(--panel); border-left: 1px solid var(--line); }
+h1, h2 { margin: 0; }
+h1 { font-family: Georgia, serif; font-weight: 500; font-size: clamp(2.8rem, 4.7vw, 4.6rem); line-height: 1.04; letter-spacing: -.055em; }
+h2 { font-family: Georgia, serif; font-weight: 500; font-size: 1.65rem; }
+.intro p, .muted { color: var(--muted); }
+.intro > p:first-of-type { margin: .7rem 0 1.6rem; }
+.primary, .secondary { padding: .55rem .8rem; border-radius: .4rem; }
+.primary { width: 100%; font-weight: 750; background: var(--gold); color: #172333; border: 1px solid var(--gold); }
+.primary[aria-pressed="true"] { background: #f3a69d; border-color: #f3a69d; }
+.secondary { background: transparent; color: var(--text); border: 1px solid var(--line); font-size: .86rem; }
+.secondary:hover, .secondary[aria-pressed="true"] { background: #29445b; }
+#status { font-size: .86rem; margin: .65rem 0 1rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+#fahrten { border-top: 1px solid var(--line); margin-top: 1.7rem; padding-top: 1.35rem; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; margin: .75rem 0 0; gap: 0 .9rem; }
+.stats div { padding: .65rem 0; border-bottom: 1px solid var(--line); }
+.stats dt { font-size: .75rem; color: var(--muted); }
+.stats dd { font-size: 1.25rem; margin: .1rem 0 0; font-variant-numeric: tabular-nums; }
+.muted { font-size: .86rem; }
+#rides { list-style: none; padding: 0; margin: 0; }
+#rides li { border-bottom: 1px solid var(--line); }
+#rides button { text-align: left; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: .75rem; color: inherit; border: 0; background: none; padding: .45rem 0; font-size: .9rem; }
+#rides button:hover { color: var(--gold); }
+#rides button span:last-child { white-space: nowrap; color: var(--muted); }
+.backup { margin-top: 1rem; }
+@media (max-width: 760px) {
+  .atlas { grid-template-columns: 1fr; }
+  .map-panel { min-height: 0; height: clamp(325px, 54svh, 490px); }
+  .sidebar { border-left: 0; border-top: 1px solid var(--line); padding: 1.25rem 1rem 2rem; }
+  h1 { font-size: 2.7rem; }
+  .intro > p:first-of-type { margin-bottom: 1rem; }
+}

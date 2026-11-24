@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motorrad-Atlas</title>
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./vendor/leaflet.js"></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">⌁</span> Motorrad-Atlas</a>
+    <a class="jump" href="#fahrten">Zu den Fahrten</a>
+  </header>
+  <main>
+    <div class="atlas">
+      <section class="map-panel" aria-label="Entdeckerkarte">
+        <div id="map"></div>
+        <div class="map-controls">
+          <button id="germany" class="secondary">Deutschland</button>
+          <button id="fit" class="secondary" hidden>Alle Spuren</button>
+        </div>
+        <div class="legend"><span aria-hidden="true"></span> Freigelegt · 200 m je Seite</div>
+      </section>
+      <aside class="sidebar">
+        <section class="intro">
+          <h1>Dein Revier.</h1>
+          <p>Jede Tour legt ein Stück Deutschland frei.</p>
+          <button id="record" class="primary">Fahrt starten</button>
+          <p id="status" role="status">Bereit für deine erste Tour.</p>
+          <div class="actions">
+            <button id="import" class="secondary">GPX importieren</button>
+            <button id="demo" class="secondary" aria-pressed="false">Beispieltour anzeigen</button>
+          </div>
+          <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden>
+        </section>
+        <section id="fahrten" aria-labelledby="rides-title">
+          <h2 id="rides-title">Deine Fahrten</h2>
+          <dl class="stats">
+            <div><dt>Gesamt</dt><dd id="total">0 km</dd></div>
+            <div><dt>Ø je Tour</dt><dd id="average-distance">–</dd></div>
+            <div><dt>Ø in Bewegung</dt><dd id="average-speed">–</dd></div>
+            <div><dt>Erdumfang dieses Jahr</dt><dd id="year-progress">0 %</dd></div>
+          </dl>
+          <p id="empty" class="muted">Hier erscheinen deine gespeicherten Touren.</p>
+          <ul id="rides"></ul>
+          <div class="actions backup">
+            <button id="export" class="secondary">Sicherung speichern</button>
+            <button id="restore" class="secondary">Sicherung einlesen</button>
+          </div>
+          <input id="backup-file" type="file" accept=".json,application/json" hidden>
+        </section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
