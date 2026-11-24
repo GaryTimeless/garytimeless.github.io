@@ -1,3 +1,4 @@
+import { createFog } from './fog.mjs';
 import { splitTrack } from './track.mjs';
 
 const GERMANY = [[47.27, 5.85], [55.06, 15.05]];
@@ -13,6 +14,7 @@ export function createAtlas(element) {
   canvas.setAttribute('aria-hidden', 'true');
   element.append(canvas);
   const context = canvas.getContext('2d');
+  const drawFog = createFog(context);
 
   leaflet.tileLayer(TILE_URL, {
     maxZoom: 19,
@@ -34,8 +36,7 @@ export function createAtlas(element) {
     canvas.style.height = height + 'px';
     context.scale(scale, scale);
 
-    context.fillStyle = 'rgba(30, 50, 72, .80)';
-    context.fillRect(0, 0, width, height);
+    drawFog(width, height, map.getPixelBounds().min);
 
     // Erase the fog before drawing the tracks. Each segment stays separate across GPS gaps.
     context.globalCompositeOperation = 'destination-out';

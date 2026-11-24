@@ -27,7 +27,7 @@ Ein Fahrtenbuch zum Selberweiterbauen. Die Karte startet im Nebel. Eine aufgenom
 | `index.html` | Beschriftungen und Aufbau der Seite |
 | `style.css` | Farben, Abstände und Handy-Layout |
 | `app.mjs` | Was bei einem Klick passiert, Aufnahme und Fahrtenliste |
-| `atlas.mjs` | Karte und Nebel. Leaflet zeigt die Karte, eine Canvas-Fläche blendet den Nebel entlang der Fahrten aus. |
+| `atlas.mjs` und `fog.mjs` | Leaflet zeigt die Karte. Die Canvas-Fläche zeichnet den Wolkennebel und blendet ihn entlang der Fahrten aus. |
 | `gps.mjs` und `track.mjs` | Standortfilter, Streckenabschnitte, Entfernungen und Geschwindigkeit |
 | `storage.mjs` und `formats.mjs` | Browserspeicher, GPX und Sicherungsdatei |
 
