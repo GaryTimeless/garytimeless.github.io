@@ -76,6 +76,8 @@ function render() {
     ui('rides').append(item);
   }
   ui('empty').hidden = journal.rides.length > 0;
+  ui('tour-pin').hidden = journal.rides.length === 0;
+  ui('pin-title').textContent = totals.distanceKm >= 1000 ? 'Tausender-Club' : totals.distanceKm >= 100 ? 'Die ersten 100 km' : 'Erste Ausfahrt';
   ui('odo').textContent = String(Math.floor(totals.distanceKm)).padStart(6,'0');
   ui('home-link').textContent = recording ? '● Aufnahme läuft · Garage' : 'Zur Garage';
   ui('total').textContent = km(totals.distanceKm);

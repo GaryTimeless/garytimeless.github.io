@@ -23,3 +23,6 @@ body[data-view="plan"] .fog,body[data-view="plan"] .legend {visibility:hidden}
 .primary,.secondary {min-height:48px}
 .garage-nav strong {font-weight:inherit}
 #fahrten #status {color:var(--muted)}
+.tour-pin {display:flex;align-items:center;gap:12px;margin:1.2rem 0;padding:12px 16px;border-left:3px solid #e7bc70;background:#233b4c}
+.tour-pin>span {display:grid;place-items:center;background:#e7bc70;color:#263644;clip-path:polygon(50% 0,95% 18%,87% 69%,50% 100%,13% 69%,5% 18%);width:40px;height:43px}
+.tour-pin strong,.tour-pin small {display:block}.tour-pin small{color:var(--muted)}
