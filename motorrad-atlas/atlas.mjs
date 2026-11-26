@@ -1,3 +1,4 @@
+import { drawClouds } from './clouds.mjs';
 import { createFog } from './fog.mjs';
 import { splitTrack } from './track.mjs';
 
@@ -8,7 +9,7 @@ const EARTH_CIRCUMFERENCE_METERS = 40075017;
 
 export function createAtlas(element) {
   const leaflet = window.L;
-  const map = leaflet.map(element, { minZoom: 4, zoomSnap: .25, zoomAnimation: false });
+  const map = leaflet.map(element, { minZoom: 4, zoomSnap: .25, zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false });
   const canvas = document.createElement('canvas');
   canvas.className = 'fog';
   canvas.setAttribute('aria-hidden', 'true');
@@ -21,6 +22,7 @@ export function createAtlas(element) {
     attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a>',
   }).addTo(map);
 
+  let animationSeconds = 0;
   let segments = [];
   let request = 0;
 
@@ -30,13 +32,15 @@ export function createAtlas(element) {
     if (!width || !height) return;
 
     const scale = window.devicePixelRatio || 1;
-    canvas.width = Math.round(width * scale);
-    canvas.height = Math.round(height * scale);
+    if (canvas.width !== Math.round(width * scale)) canvas.width = Math.round(width * scale);
+    if (canvas.height !== Math.round(height * scale)) canvas.height = Math.round(height * scale);
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
-    context.scale(scale, scale);
+    context.setTransform(scale,0,0,scale,0,0);
+    context.clearRect(0,0,width,height);
 
     drawFog(width, height, map.getPixelBounds().min);
+    drawClouds(context,width,height,map.getPixelBounds().min,animationSeconds);
 
     // Erase the fog before drawing the tracks. Each segment stays separate across GPS gaps.
     context.globalCompositeOperation = 'destination-out';
@@ -86,9 +90,15 @@ export function createAtlas(element) {
   }
 
   map.on('move zoom resize', redraw);
-  showGermany();
+  map.setView([51,10],6);
+  setInterval(() => {
+    if (document.hidden || document.body.dataset.view !== 'aufnahme' || !document.getElementById('motion').checked) return;
+    animationSeconds += .15;
+    redraw();
+  },150);
 
   return {
+    map,
     showGermany,
     showTracks(rides, highlightId) {
       segments = rides.flatMap(ride => splitTrack(ride.points).map(points => ({

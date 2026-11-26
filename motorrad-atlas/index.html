@@ -5,17 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Motorrad-Atlas</title>
   <link rel="stylesheet" href="./vendor/leaflet.css">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./garage.css">
   <script src="./vendor/leaflet.js"></script>
-  <script type="module" src="./app.mjs"></script>
+  <script type="module" src="./app.mjs?v=garage1"></script>
 </head>
 <body>
-  <header class="top">
-    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">⌁</span> Motorrad-Atlas</a>
-    <a class="jump" href="#fahrten">Zu den Fahrten</a>
-  </header>
+  <header class="top"><a class="brand" href="#garage"><span class="brand-mark">⌁</span> Motorrad-Atlas</a><a href="#garage" id="home-link">Zur Garage</a></header>
   <main>
-    <div class="atlas">
+    <section id="garage" class="garage">
+      <div class="poster"><div><h1>Meine Garage</h1><p>Dein Fahrtenbuch für offene Straßen.</p></div><img src="./passstrasse.png" alt="Goldenes Café-Racer-Motorrad auf einer Passstraße im Abendlicht"></div>
+      <div class="tripmeter"><span>Tourenkilometer</span><strong id="odo">000000</strong> km</div>
+      <nav class="garage-nav" aria-label="Garage">
+        <a href="#aufnahme" class="ride-link"><b>◉</b> <strong id="ride-label">Aufzeichnung</strong> <span>→</span></a>
+        <a href="#plan"><b>↝</b> Route planen <span>→</span></a>
+        <a href="#statistik"><b>▥</b> Statistiken &amp; Fahrten <span>→</span></a>
+        <button id="invite"><b>＋</b> Freunde einladen <small>Demo</small></button>
+        <a href="#werkstatt"><b>⚙</b> Einstellungen testen <span>→</span></a>
+      </nav>
+    </section>
+    <div class="atlas" hidden>
       <section class="map-panel" aria-label="Entdeckerkarte">
         <div id="map"></div>
         <div class="map-controls">
@@ -26,8 +34,8 @@
       </section>
       <aside class="sidebar">
         <section class="intro">
-          <h1>Dein Revier.</h1>
-          <p>Jede Tour legt ein Stück Deutschland frei.</p>
+          <h1>Aufzeichnung</h1>
+          <p>Dein Standort zeichnet die Spur auf. Lass Chrome sichtbar und das Display an.</p>
           <button id="record" class="primary">Fahrt starten</button>
           <p id="status" role="status">Bereit für deine erste Tour.</p>
           <div class="actions">
@@ -36,6 +44,8 @@
           </div>
           <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden>
         </section>
+        <section id="plan-panel" hidden><h1>Tour planen</h1><p>Zoome zum Start und tippe auf die Karte. Setze danach Zwischenziele und zum Schluss dein Ziel.</p><ol id="stops"></ol><button class="primary" id="calculate" disabled>Straßenroute berechnen</button><button class="secondary" id="undo" disabled>Letzten Punkt entfernen</button><p id="route-result" role="status"></p><small>Die Berechnung sendet die gewählten Punkte an OSRM und verwendet das Pkw-Straßenprofil.</small></section>
+        <section id="werkstatt-panel" hidden><h1>Werkstatt</h1><p>Prüfe Standortfreigabe und Display-Wachhalten vor deiner Fahrt.</p><p><label><input id="motion" type="checkbox"> Wolken animieren</label></p><button class="primary" id="check">Einstellungen testen</button><p id="check-result" role="status"></p></section>
         <section id="fahrten" aria-labelledby="rides-title">
           <h2 id="rides-title">Deine Fahrten</h2>
           <dl class="stats">
@@ -44,7 +54,7 @@
             <div><dt>Ø in Bewegung</dt><dd id="average-speed">–</dd></div>
             <div><dt>Erdumfang dieses Jahr</dt><dd id="year-progress">0 %</dd></div>
           </dl>
-          <p id="empty" class="muted">Hier erscheinen deine gespeicherten Touren.</p>
+          <p id="empty" class="muted">Hier erscheinen deine gespeicherten Touren. <a href="#aufnahme">Erste Fahrt aufzeichnen</a></p>
           <ul id="rides"></ul>
           <div class="actions backup">
             <button id="export" class="secondary">Sicherung speichern</button>
@@ -54,6 +64,6 @@
         </section>
       </aside>
     </div>
-  </main>
+  </main><dialog id="invite-dialog"><h2>Gemeinsam auf Tour</h2><p>Die Freunde-Einladung ist eine Vorschau. Hier kannst du sie ausprobieren.</p><form method="dialog"><button class="primary">Zurück zur Garage</button></form></dialog>
 </body>
 </html>

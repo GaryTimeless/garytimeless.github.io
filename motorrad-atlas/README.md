@@ -50,3 +50,9 @@ Chrome liefert Koordinaten, einen Zeitstempel und eine geschätzte Genauigkeit. 
 Fahrten liegen lokal in IndexedDB, getrennt nach Browser und Webadresse. Denke beim Wechsel vom lokalen Test auf eine HTTPS-Adresse an **Sicherung speichern** und **Sicherung einlesen**. Der Atlas hat keinen Server für Fahrtdaten. Normale Kachelanfragen gehen an OpenStreetMap, damit die Grundkarte sichtbar wird. Der Kacheldienst arbeitet nach Verfügbarkeit und erlaubt keine vorab heruntergeladenen Offline-Karten. [OpenStreetMap-Kachelrichtlinie](https://operations.osmfoundation.org/policies/tiles/)
 
 Eine Google-Grundkarte wäre über die Maps JavaScript API möglich. GPS-Aufzeichnung, Statistik und gespeicherte Fahrten könnten weiter gleich funktionieren. Für die Google-Karte bräuchtest du einen API- und Abrechnungszugang sowie eine Anpassung von `atlas.mjs`. [Nutzung und Abrechnung](https://developers.google.com/maps/documentation/javascript/usage-and-billing) · [Preisliste](https://developers.google.com/maps/billing-and-pricing/pricing)
+
+## Garage und Tourplanung
+
+Die Garage führt zur Aufzeichnung, zum Fahrtenbuch mit Statistik, zur Tourplanung und zum Einstellungstest. Die Freunde-Einladung ist eine interaktive Vorschau. Das Pixelmotorrad und die Wolkensprites gehören zum Projekt. Die Werkstatt berücksichtigt die Bewegungseinstellung des Geräts und erlaubt eine eigene Wahl.
+
+Im Routenplaner zuerst in das gewünschte Gebiet zoomen, dann Start, optionale Zwischenziele und Ziel per Kartentipp setzen. „Straßenroute berechnen“ sendet diese Wegpunkte an den öffentlichen OSRM-Dienst. Dessen Pkw-Profil liefert Straßenverlauf, geschätzte Dauer und Entfernung. Die letzte Planung bleibt separat in diesem Browser gespeichert. Das Fahrtenbuch und seine Statistiken verwenden aufgezeichnete oder importierte Fahrten.

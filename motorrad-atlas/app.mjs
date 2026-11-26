@@ -1,4 +1,5 @@
-import { createAtlas } from './atlas.mjs';
+import { setupGarage } from './garage.mjs';
+import { createAtlas } from './atlas.mjs?v=garage1';
 import { DEMO_RIDE, parseBackup, parseGpx } from './formats.mjs';
 import { checkedFix } from './gps.mjs';
 import { openJournal, readJournal, writeJournal } from './storage.mjs';
@@ -11,6 +12,7 @@ const km = value => number.format(value) + ' km';
 const setStatus = text => { if (ui('status').textContent !== text) ui('status').textContent = text; };
 
 const atlas = createAtlas(ui('map'));
+const garage = setupGarage(atlas);
 let journal = { rides: [], draft: null };
 let database;
 let watchId = null;
@@ -34,6 +36,7 @@ function renderMap() {
 
 function render() {
   const recording = watchId !== null;
+  ui('ride-label').textContent = recording ? 'Zur laufenden Aufnahme' : journal.draft ? 'Gesicherter Fahrtentwurf' : 'Aufzeichnung';
   ui('record').textContent = recording ? 'Fahrt beenden' : journal.draft ? 'Entwurf speichern' : 'Fahrt starten';
   ui('record').setAttribute('aria-pressed', String(recording));
   ui('record').disabled = busy || !database;
@@ -65,6 +68,7 @@ function render() {
       showDemo = false;
       selectedId = ride.id;
       render();
+      garage.openRecording();
       atlas.fitTracks([ride]);
       ui('map').scrollIntoView({ block: 'start' });
     });
@@ -72,6 +76,8 @@ function render() {
     ui('rides').append(item);
   }
   ui('empty').hidden = journal.rides.length > 0;
+  ui('odo').textContent = String(Math.floor(totals.distanceKm)).padStart(6,'0');
+  ui('home-link').textContent = recording ? '● Aufnahme läuft · Garage' : 'Zur Garage';
   ui('total').textContent = km(totals.distanceKm);
   ui('average-distance').textContent = journal.rides.length ? km(totals.distanceKm / journal.rides.length) : '–';
   ui('average-speed').textContent = totals.movingSeconds

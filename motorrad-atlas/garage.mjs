@@ -1,0 +1,124 @@
+export function setupGarage(atlas) {
+  const byId = id => document.getElementById(id);
+  const {map} = atlas;
+  const group = L.layerGroup();
+  let points = [];
+  let savedRoute;
+  try {
+    const saved = JSON.parse(localStorage.getItem('atlas-tourplan'));
+    if (Array.isArray(saved?.points)) {
+      points = saved.points.map(p => L.latLng(p.lat,p.lng));
+      savedRoute = saved.route;
+    }
+  } catch { points = []; }
+  function persist() {
+    try { localStorage.setItem('atlas-tourplan',JSON.stringify({points,route:savedRoute})); } catch {}
+  }
+  let line;
+  let controller;
+  let firstMap = true;
+  const motion = byId('motion');
+  motion.checked = localStorage.getItem('atlas-clouds') === null
+    ? !matchMedia('(prefers-reduced-motion: reduce)').matches : localStorage.getItem('atlas-clouds') === 'on';
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',event => {
+    if (localStorage.getItem('atlas-clouds') === null) motion.checked = !event.matches;
+  });
+  motion.onchange = () => localStorage.setItem('atlas-clouds',motion.checked ? 'on' : 'off');
+  byId('invite').onclick = () => byId('invite-dialog').showModal();
+  byId('check').onclick = async () => {
+    let permission = 'unbekannt';
+    try {
+      const result = await navigator.permissions.query({name:'geolocation'});
+      permission = {granted:'erlaubt',prompt:'wird beim Start erfragt',denied:'gesperrt'}[result.state];
+    } catch {}
+    byId('check-result').textContent = 'Standort: ' + permission + ' · Wachhalten: ' + ('wakeLock' in navigator ? 'unterstützt' : 'nicht verfügbar') + ' · Wolken: ' + (motion.checked ? 'animiert' : 'ruhig');
+  };
+
+  function view() {
+    const route = location.hash.slice(1);
+    const current = ['aufnahme','statistik','plan','werkstatt'].includes(route) ? route : 'garage';
+    document.body.dataset.view = current;
+    byId('garage').hidden = current !== 'garage';
+    document.querySelector('.atlas').hidden = current === 'garage';
+    document.querySelector('.map-panel').hidden = !['aufnahme','plan'].includes(current);
+    document.querySelector('.intro').hidden = current !== 'aufnahme';
+    byId('fahrten').hidden = current !== 'statistik';
+    byId('werkstatt-panel').hidden = current !== 'werkstatt';
+    byId('plan-panel').hidden = current !== 'plan';
+    byId('home-link').hidden = current === 'garage';
+    if (current === 'plan') group.addTo(map);
+    else group.remove();
+    if (current === 'plan' || current === 'aufnahme') {
+      map.invalidateSize({pan:false});
+      if (firstMap && current === 'plan' && points.length) map.fitBounds(L.latLngBounds(points),{padding:[28,28],maxZoom:15,animate:false});
+      else if (firstMap) atlas.showGermany();
+      firstMap = false;
+    }
+    const target = current === 'statistik' ? byId('fahrten') : document.querySelector(current === 'garage' ? '#garage h1' : current === 'aufnahme' ? '.intro h1' : '#' + current + '-panel h1');
+    target.tabIndex = -1;
+    target.focus({preventScroll:true});
+    if (current === 'statistik') byId('fahrten').append(byId('status'));
+    else document.querySelector('.intro .actions').before(byId('status'));
+    window.scrollTo(0,0);
+  }
+  function updatePoints(restore = false) {
+    controller?.abort(); controller = null;
+    group.clearLayers();
+    line = null;
+    const stops = byId('stops');
+    stops.replaceChildren();
+    points.forEach((point,index) => {
+      const label = index === 0 ? 'Start' : index === points.length - 1 ? 'Ziel' : 'Zwischenziel';
+      L.marker(point).bindTooltip(label).addTo(group);
+      const item = document.createElement('li');
+      item.textContent = label + ' · ' + point.lat.toFixed(3) + '°, ' + point.lng.toFixed(3) + '°';
+      stops.append(item);
+    });
+    byId('calculate').disabled = points.length < 2;
+    byId('undo').disabled = !points.length;
+    byId('route-result').textContent = '';
+    if (restore && savedRoute) showRoute(savedRoute);
+    else { savedRoute = null; persist(); }
+  }
+  function showRoute(route) {
+    if (line) group.removeLayer(line);
+    line = L.geoJSON(route.geometry,{style:{color:'#1b4193',weight:6}}).addTo(group);
+    const minutes = Math.max(1,Math.round(route.duration/60));
+    byId('route-result').textContent = (route.distance/1000).toLocaleString('de-DE',{maximumFractionDigits:1}) + ' km · ca. ' + minutes + (minutes === 1 ? ' Minute' : ' Minuten');
+
+  }
+  map.on('click',event => {
+    if (document.body.dataset.view === 'plan') {
+      points.push(event.latlng);
+      updatePoints();
+    }
+  });
+  byId('undo').onclick = () => { points.pop(); updatePoints(); };
+  byId('calculate').onclick = async () => {
+    const request = new AbortController();
+    controller = request;
+    byId('calculate').disabled = true;
+    byId('route-result').textContent = 'Straßenroute wird berechnet …';
+    const timeout = setTimeout(() => request.abort(),15000);
+    try {
+      const coords = points.map(p => p.lng + ',' + p.lat).join(';');
+      const response = await fetch('https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson',{signal:request.signal});
+      const data = await response.json();
+      if (!response.ok || data.code !== 'Ok') throw Error();
+      const route = data.routes[0];
+      savedRoute = route;
+      showRoute(route);
+      map.fitBounds(line.getBounds(),{padding:[30,30],animate:false});
+      persist();
+    } catch {
+      if (controller === request) byId('route-result').textContent = 'Route nicht verfügbar. Prüfe die Verbindung oder ändere einen Punkt.';
+    } finally {
+      clearTimeout(timeout);
+      if (controller === request) byId('calculate').disabled = points.length < 2;
+    }
+  };
+  updatePoints(true);
+  window.addEventListener('hashchange',view);
+  view();
+  return {openRecording() {location.hash = 'aufnahme'; view();}};
+}

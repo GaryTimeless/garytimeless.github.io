@@ -1,0 +1,25 @@
+body {background:#101e2a}
+.top {max-width:1240px;margin:auto}
+#home-link {font-size:.9rem;text-underline-offset:4px}
+.garage {max-width:1040px;margin:clamp(16px,4vw,48px) auto;padding:0 16px 40px}
+.poster {position:relative;overflow:hidden;background:#263d51;border-radius:14px 14px 0 0}
+.poster img {width:100%;display:block;image-rendering:pixelated}
+.poster>div {position:absolute;z-index:1;top:12%;left:5%;text-shadow:0 2px 9px #122534}
+h1,.poster h1 {font:italic 800 clamp(2.2rem,6vw,5rem)/1 Georgia,serif;letter-spacing:-.06em}
+.poster p {margin:.65rem 0 0}
+.tripmeter {background:#263b4b;border-bottom:3px solid #d6ad61;padding:12px 5%;display:flex;align-items:center;gap:.7rem;color:#ebdcc3}
+.tripmeter strong {font:700 1.4rem monospace;letter-spacing:.18em;background:#12222f;color:#fff0d4;padding:.15em .4em;border-radius:3px}
+.garage-nav {display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.garage-nav>a,.garage-nav>button {text-decoration:none;border:1px solid #4e6474;background:#203444;color:#fff1dc;display:flex;align-items:center;gap:12px;min-height:60px;padding:12px 18px;border-radius:7px;font:600 1rem system-ui;text-align:left}
+.garage-nav .ride-link {background:#f1c776;color:#172635;border-color:#f1c776}
+.garage-nav b {font-size:1.45rem}.garage-nav span,.garage-nav small {margin-left:auto}
+.garage-nav a:hover,.garage-nav button:hover {outline:2px solid #efc36e}
+dialog {background:#203444;color:#fff1dc;border:1px solid #c4a567;border-radius:12px;max-width:min(380px,90vw)}dialog::backdrop{background:#07121cc9}
+body[data-view="statistik"] .atlas,body[data-view="werkstatt"] .atlas {display:block;min-height:0;max-width:760px;margin:1rem auto}
+#fahrten {margin-top:0;border-top:0}
+body[data-view="plan"] .fog,body[data-view="plan"] .legend {visibility:hidden}
+#stops {padding-left:1.6rem}#undo {margin-top:8px}
+@media(max-width:760px){.garage-nav{grid-template-columns:1fr}.poster img{height:210px;object-fit:cover;object-position:68% center}.poster>div{top:12px}.poster h1{font-size:2.3rem}.poster p{font-size:.82rem;margin:.25rem 0}.garage-nav>a,.garage-nav>button{min-height:50px}.garage{margin-top:16px}}
+.primary,.secondary {min-height:48px}
+.garage-nav strong {font-weight:inherit}
+#fahrten #status {color:var(--muted)}
