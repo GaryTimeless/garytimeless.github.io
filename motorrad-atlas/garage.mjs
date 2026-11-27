@@ -1,18 +1,23 @@
+import { setupPlaceSearch } from './place-search.mjs';
 export function setupGarage(atlas) {
   const byId = id => document.getElementById(id);
   const {map} = atlas;
   const group = L.layerGroup();
   let points = [];
   let savedRoute;
+  let searchedGoal = false;
+  let goalOnly = false;
   try {
     const saved = JSON.parse(localStorage.getItem('atlas-tourplan'));
     if (Array.isArray(saved?.points)) {
-      points = saved.points.map(p => L.latLng(p.lat,p.lng));
+      points = saved.points.map(p => Object.assign(L.latLng(p.lat,p.lng), {name:p.name}));
+      searchedGoal = Boolean(saved.searchedGoal && points.length);
+      goalOnly = searchedGoal && points.length === 1 && saved.goalOnly;
       savedRoute = saved.route;
     }
   } catch { points = []; }
   function persist() {
-    try { localStorage.setItem('atlas-tourplan',JSON.stringify({points,route:savedRoute})); } catch {}
+    try { localStorage.setItem('atlas-tourplan',JSON.stringify({points,route:savedRoute,searchedGoal,goalOnly})); } catch {}
   }
   let line;
   let controller;
@@ -68,10 +73,10 @@ export function setupGarage(atlas) {
     const stops = byId('stops');
     stops.replaceChildren();
     points.forEach((point,index) => {
-      const label = index === 0 ? 'Start' : index === points.length - 1 ? 'Ziel' : 'Zwischenziel';
+      const label = goalOnly ? 'Ziel' : index === 0 ? 'Start' : index === points.length - 1 ? 'Ziel' : 'Zwischenziel';
       L.marker(point).bindTooltip(label).addTo(group);
       const item = document.createElement('li');
-      item.textContent = label + ' · ' + point.lat.toFixed(3) + '°, ' + point.lng.toFixed(3) + '°';
+      item.textContent = label + ' · ' + (point.name || point.lat.toFixed(3) + '°, ' + point.lng.toFixed(3) + '°');
       stops.append(item);
     });
     byId('calculate').disabled = points.length < 2;
@@ -89,11 +94,39 @@ export function setupGarage(atlas) {
   }
   map.on('click',event => {
     if (document.body.dataset.view === 'plan') {
-      points.push(event.latlng);
+      if (searchedGoal) points.splice(points.length - 1,0,event.latlng);
+      else points.push(event.latlng);
+      goalOnly = false;
       updatePoints();
     }
   });
-  byId('undo').onclick = () => { points.pop(); updatePoints(); };
+  byId('undo').onclick = () => {
+    points.pop();
+    searchedGoal = false;
+    goalOnly = false;
+    updatePoints();
+  };
+  setupPlaceSearch({
+    start(point) {
+      if (goalOnly) points.unshift(point);
+      else points[0] = point;
+      goalOnly = false;
+      updatePoints();
+      framePlan();
+    },
+    destination(point) {
+      if (goalOnly || points.length >= 2) points[points.length - 1] = point;
+      else points.push(point);
+      searchedGoal = true;
+      goalOnly = points.length === 1;
+      updatePoints();
+      framePlan();
+      return goalOnly;
+    }
+  });
+  function framePlan() {
+    map.fitBounds(L.latLngBounds(points),{padding:[30,30],maxZoom:14,animate:false});
+  }
   byId('calculate').onclick = async () => {
     const request = new AbortController();
     controller = request;

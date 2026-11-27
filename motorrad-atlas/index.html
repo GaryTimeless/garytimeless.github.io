@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Motorrad-Atlas</title>
   <link rel="stylesheet" href="./vendor/leaflet.css">
-  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./garage.css">
+  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./garage.css?v=zielsuche1">
   <script src="./vendor/leaflet.js"></script>
-  <script type="module" src="./app.mjs?v=garage1"></script>
+  <script type="module" src="./app.mjs?v=zielsuche1"></script>
 </head>
 <body>
   <header class="top"><a class="brand" href="#garage"><span class="brand-mark">⌁</span> Motorrad-Atlas</a><a href="#garage" id="home-link">Zur Garage</a></header>
@@ -44,7 +44,15 @@
           </div>
           <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden>
         </section>
-        <section id="plan-panel" hidden><h1>Tour planen</h1><p>Zoome zum Start und tippe auf die Karte. Setze danach Zwischenziele und zum Schluss dein Ziel.</p><ol id="stops"></ol><button class="primary" id="calculate" disabled>Straßenroute berechnen</button><button class="secondary" id="undo" disabled>Letzten Punkt entfernen</button><p id="route-result" role="status"></p><small>Die Berechnung sendet die gewählten Punkte an OSRM und verwendet das Pkw-Straßenprofil.</small></section>
+        <section id="plan-panel" hidden><h1>Tour planen</h1>
+          <button id="locate-start" class="secondary">Mein Standort als Start</button>
+          <p id="location-status" role="status"></p>
+          <form id="destination-search">
+            <label for="destination">Ziel suchen</label>
+            <div><input id="destination" type="search" placeholder="Stadt, Adresse oder Ausflugsziel" required maxlength="180"><button class="secondary">Suchen</button></div>
+          </form>
+          <p id="search-status" role="status"></p><ul id="matches"></ul>
+          <p>Start und Wegpunkte kannst du auch auf der Karte setzen. Bei einem gewählten Suchziel fügt jeder weitere Tipp einen Zwischenstopp ein.</p><ol id="stops"></ol><button class="primary" id="calculate" disabled>Straßenroute berechnen</button><button class="secondary" id="undo" disabled>Letzten Punkt entfernen</button><p id="route-result" role="status"></p><small>Die Ortssuche sendet den Suchtext an Photon. Die Berechnung sendet die gewählten Punkte an OSRM und verwendet das Pkw-Straßenprofil.</small></section>
         <section id="werkstatt-panel" hidden><h1>Werkstatt</h1><p>Prüfe Standortfreigabe und Display-Wachhalten vor deiner Fahrt.</p><p><label><input id="motion" type="checkbox"> Wolken animieren</label></p><button class="primary" id="check">Einstellungen testen</button><p id="check-result" role="status"></p></section>
         <section id="fahrten" aria-labelledby="rides-title">
           <h2 id="rides-title">Deine Fahrten</h2>
