@@ -2,28 +2,45 @@ export function setupPlaceSearch(plan) {
   const element = id => document.getElementById(id);
   const locate = element('locate-start');
   const locationStatus = element('location-status');
+  let locationRequest = 0;
   locate.onclick = () => {
+    const request = ++locationRequest;
     if (!navigator.geolocation) {
-      locationStatus.textContent = 'Standort ist hier nicht verfügbar. Tippe den Start auf der Karte an.';
+      locationStatus.textContent = 'Standort ist hier nicht verfügbar. Gib den Start unten ein.';
       return;
     }
     locate.disabled = true;
     locationStatus.textContent = 'Standort wird ermittelt …';
     navigator.geolocation.getCurrentPosition(position => {
+      if (request !== locationRequest) return;
       locate.disabled = false;
       const point = L.latLng(position.coords.latitude,position.coords.longitude);
       point.name = 'Mein Standort';
       plan.start(point);
       locationStatus.textContent = 'Start gesetzt · Genauigkeit etwa ±' + Math.round(position.coords.accuracy) + ' m.';
     }, error => {
+      if (request !== locationRequest) return;
       locate.disabled = false;
-      locationStatus.textContent = (error.code === 1 ? 'Standortzugriff gesperrt.' : 'Standort konnte nicht ermittelt werden.') + ' Wähle den Start auf der Karte oder versuche es erneut.';
+      locationStatus.textContent = (error.code === 1 ? 'Standortzugriff gesperrt.' : 'Standort konnte nicht ermittelt werden.') + ' Gib den Start unten ein.';
     }, {enableHighAccuracy:true,timeout:12000,maximumAge:30000});
   };
 
-  const input = element('destination');
-  const matches = element('matches');
-  const status = element('search-status');
+  bindSearch('origin','origin-matches','origin-status',point => {
+    locationRequest++;
+    locate.disabled = false;
+    plan.start(point);
+    locationStatus.textContent = '';
+    return 'Start gesetzt.';
+  });
+  bindSearch('destination','matches','search-status',point => plan.destination(point)
+    ? 'Ziel gesetzt. Wähle jetzt deinen Start.' : 'Ziel gesetzt. Die Route ist bereit zur Berechnung.');
+}
+
+function bindSearch(field, listId, statusId, select) {
+  const element = id => document.getElementById(id);
+  const input = element(field);
+  const matches = element(listId);
+  const status = element(statusId);
   let pending;
   input.oninput = () => {
     pending?.abort();
@@ -31,7 +48,7 @@ export function setupPlaceSearch(plan) {
     matches.replaceChildren();
     status.textContent = '';
   };
-  element('destination-search').onsubmit = async event => {
+  element(field + '-search').onsubmit = async event => {
     event.preventDefault();
     input.oninput();
     const query = input.value.trim();
@@ -59,17 +76,17 @@ export function setupPlaceSearch(plan) {
         button.onclick = () => {
           const point = L.latLng(lat,lng);
           point.name = label;
-          const needsStart = plan.destination(point);
+          const message = select(point);
           input.value = title;
           matches.replaceChildren();
-          status.textContent = needsStart ? 'Ziel gesetzt. Wähle jetzt deinen Start.' : 'Ziel gesetzt. Die Route ist bereit zur Berechnung.';
+          status.textContent = message;
         };
         item.append(button);
         matches.append(item);
       }
-      status.textContent = matches.childElementCount ? 'Treffer als Ziel auswählen.' : 'Keine Treffer. Ergänze den Ort oder ändere den Suchbegriff.';
+      status.textContent = matches.childElementCount ? (field === 'origin' ? 'Treffer als Start auswählen.' : 'Treffer als Ziel auswählen.') : 'Keine Treffer. Ergänze den Ort oder ändere den Suchbegriff.';
     } catch {
-      if (pending === request) status.textContent = 'Suche derzeit nicht erreichbar. Versuche es erneut oder wähle das Ziel auf der Karte.';
+      if (pending === request) status.textContent = 'Suche derzeit nicht erreichbar. Versuche es erneut oder wähle den Punkt auf der Karte.';
     } finally {
       clearTimeout(timer);
     }

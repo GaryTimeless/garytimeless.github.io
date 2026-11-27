@@ -27,10 +27,12 @@ body[data-view="plan"] .fog,body[data-view="plan"] .legend {visibility:hidden}
 .tour-pin>span {display:grid;place-items:center;background:#e7bc70;color:#263644;clip-path:polygon(50% 0,95% 18%,87% 69%,50% 100%,13% 69%,5% 18%);width:40px;height:43px}
 .tour-pin strong,.tour-pin small {display:block}.tour-pin small{color:var(--muted)}
 #locate-start {margin-top:1.2rem}
-#destination-search label {display:block;margin-bottom:.35rem;font-weight:700}
-#destination-search div {display:flex;gap:.4rem}
-#destination {min-width:0;flex:1;font:inherit;font-size:1rem;color:var(--text);background:#102333;border:1px solid var(--line);border-radius:.4rem;padding:.55rem}
-#matches {list-style:none;padding:0}
-#matches button {width:100%;text-align:left;margin-bottom:.3rem}
+:is(#origin-search,#destination-search) label {display:block;margin-bottom:.35rem;font-weight:700}
+:is(#origin-search,#destination-search) div {display:flex;gap:.4rem}
+:is(#origin,#destination) {min-width:0;flex:1;font:inherit;font-size:1rem;color:var(--text);background:#102333;border:1px solid var(--line);border-radius:.4rem;padding:.55rem}
+:is(#matches,#origin-matches) {list-style:none;padding:0}
+:is(#matches,#origin-matches) button {width:100%;text-align:left;margin-bottom:.3rem}
 #plan-panel [role=status]:empty {display:none}
 @media(max-width:760px){body[data-view="plan"] .sidebar{grid-row:1}body[data-view="plan"] .map-panel{grid-row:2}}
+
+#navigation-links a {display:block;text-align:center;text-decoration:none;margin:.5rem 0}

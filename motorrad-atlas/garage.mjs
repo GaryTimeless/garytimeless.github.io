@@ -1,4 +1,4 @@
-import { setupPlaceSearch } from './place-search.mjs';
+import { setupPlaceSearch } from './place-search.mjs?v=navigation2';
 export function setupGarage(atlas) {
   const byId = id => document.getElementById(id);
   const {map} = atlas;
@@ -68,6 +68,8 @@ export function setupGarage(atlas) {
   }
   function updatePoints(restore = false) {
     controller?.abort(); controller = null;
+    byId('navigation').hidden = true;
+    byId('navigation-links').replaceChildren();
     group.clearLayers();
     line = null;
     const stops = byId('stops');
@@ -86,6 +88,22 @@ export function setupGarage(atlas) {
     else { savedRoute = null; persist(); }
   }
   function showRoute(route) {
+    const links = byId('navigation-links');
+    links.replaceChildren();
+    // Mobile Maps URLs support three intermediate stops per link.
+    for (let start = 0; start < points.length - 1; start += 4) {
+      const leg = points.slice(start,start + 5).map(point => point.lat + ',' + point.lng);
+      const params = new URLSearchParams({api:'1',origin:leg[0],destination:leg.at(-1),travelmode:'driving',dir_action:'navigate'});
+      if (leg.length > 2) params.set('waypoints',leg.slice(1,-1).join('|'));
+      const link = document.createElement('a');
+      link.className = 'primary';
+      link.textContent = points.length <= 5 ? 'Navigation in Google Maps starten' : 'Etappe ' + (start / 4 + 1) + ' in Google Maps starten';
+      link.href = 'https://www.google.com/maps/dir/?' + params;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      links.append(link);
+    }
+    byId('navigation').hidden = !links.childElementCount;
     if (line) group.removeLayer(line);
     line = L.geoJSON(route.geometry,{style:{color:'#1b4193',weight:6}}).addTo(group);
     const minutes = Math.max(1,Math.round(route.duration/60));
