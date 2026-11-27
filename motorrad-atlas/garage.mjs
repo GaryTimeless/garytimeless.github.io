@@ -1,7 +1,9 @@
+import { createGuidance } from './guidance.mjs';
 import { setupPlaceSearch } from './place-search.mjs?v=navigation2';
 export function setupGarage(atlas) {
   const byId = id => document.getElementById(id);
   const {map} = atlas;
+  const guidance = createGuidance(map);
   const group = L.layerGroup();
   let points = [];
   let savedRoute;
@@ -52,7 +54,7 @@ export function setupGarage(atlas) {
     byId('plan-panel').hidden = current !== 'plan';
     byId('home-link').hidden = current === 'garage';
     if (current === 'plan') group.addTo(map);
-    else group.remove();
+    else { group.remove(); guidance.stop(); }
     if (current === 'plan' || current === 'aufnahme') {
       map.invalidateSize({pan:false});
       if (firstMap && current === 'plan' && points.length) map.fitBounds(L.latLngBounds(points),{padding:[28,28],maxZoom:15,animate:false});
@@ -111,7 +113,7 @@ export function setupGarage(atlas) {
 
   }
   map.on('click',event => {
-    if (document.body.dataset.view === 'plan') {
+    if (document.body.dataset.view === 'plan' && !document.body.classList.contains('guiding')) {
       if (searchedGoal) points.splice(points.length - 1,0,event.latlng);
       else points.push(event.latlng);
       goalOnly = false;
@@ -145,28 +147,36 @@ export function setupGarage(atlas) {
   function framePlan() {
     map.fitBounds(L.latLngBounds(points),{padding:[30,30],maxZoom:14,animate:false});
   }
-  byId('calculate').onclick = async () => {
+  async function calculate() {
     const request = new AbortController();
+    controller?.abort();
     controller = request;
     byId('calculate').disabled = true;
     byId('route-result').textContent = 'Straßenroute wird berechnet …';
     const timeout = setTimeout(() => request.abort(),15000);
     try {
       const coords = points.map(p => p.lng + ',' + p.lat).join(';');
-      const response = await fetch('https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson',{signal:request.signal});
+      const response = await fetch('https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson&steps=true',{signal:request.signal});
       const data = await response.json();
+      if (controller !== request) return;
       if (!response.ok || data.code !== 'Ok') throw Error();
       const route = data.routes[0];
       savedRoute = route;
       showRoute(route);
       map.fitBounds(line.getBounds(),{padding:[30,30],animate:false});
       persist();
+      return route;
     } catch {
       if (controller === request) byId('route-result').textContent = 'Route nicht verfügbar. Prüfe die Verbindung oder ändere einen Punkt.';
     } finally {
       clearTimeout(timeout);
       if (controller === request) byId('calculate').disabled = points.length < 2;
     }
+  };
+  byId('calculate').onclick = calculate;
+  byId('guide-start').onclick = async () => {
+    const route = savedRoute?.legs?.every(leg => leg.steps?.length) ? savedRoute : await calculate();
+    if (route && savedRoute === route && document.body.dataset.view === 'plan') guidance.start(route);
   };
   updatePoints(true);
   window.addEventListener('hashchange',view);

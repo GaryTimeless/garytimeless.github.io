@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Motorrad-Atlas</title>
   <link rel="stylesheet" href="./vendor/leaflet.css">
-  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./garage.css?v=navigation2">
+  <link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./garage.css?v=atlasnav3">
   <script src="./vendor/leaflet.js"></script>
-  <script type="module" src="./app.mjs?v=navigation2"></script>
+  <script type="module" src="./app.mjs?v=atlasnav3"></script>
 </head>
 <body>
   <header class="top"><a class="brand" href="#garage"><span class="brand-mark">⌁</span> Motorrad-Atlas</a><a href="#garage" id="home-link">Zur Garage</a></header>
@@ -25,7 +25,7 @@
     </section>
     <div class="atlas" hidden>
       <section class="map-panel" aria-label="Entdeckerkarte">
-        <div id="map"></div>
+        <div id="map"></div><section id="guidance" hidden aria-label="Navigation"><strong id="guide-hint" role="status"></strong><small id="guide-detail"></small><button id="guide-stop" class="secondary">Navigation schließen</button></section>
         <div class="map-controls">
           <button id="germany" class="secondary">Deutschland</button>
           <button id="fit" class="secondary" hidden>Alle Spuren</button>
@@ -57,7 +57,7 @@
             <div><input id="destination" type="search" placeholder="Stadt, Adresse oder Ausflugsziel" required maxlength="180"><button class="secondary">Suchen</button></div>
           </form>
           <p id="search-status" role="status"></p><ul id="matches"></ul>
-          <p>Start und Wegpunkte kannst du auch auf der Karte setzen. Bei einem gewählten Suchziel fügt jeder weitere Tipp einen Zwischenstopp ein.</p><ol id="stops"></ol><button class="primary" id="calculate" disabled>Straßenroute berechnen</button><button class="secondary" id="undo" disabled>Letzten Punkt entfernen</button><p id="route-result" role="status"></p><section id="navigation" hidden><div id="navigation-links"></div><p>Google Maps führt dich über deine Wegpunkte und berechnet den Straßenverlauf selbst. Beim App-Wechsel kann die Atlas-Aufnahme pausieren.</p></section><small>Die Ortssuche sendet den Suchtext an Photon. Die Berechnung sendet die gewählten Punkte an OSRM und verwendet das Pkw-Straßenprofil.</small></section>
+          <p>Start und Wegpunkte kannst du auch auf der Karte setzen. Bei einem gewählten Suchziel fügt jeder weitere Tipp einen Zwischenstopp ein.</p><ol id="stops"></ol><button class="primary" id="calculate" disabled>Straßenroute berechnen</button><button class="secondary" id="undo" disabled>Letzten Punkt entfernen</button><p id="route-result" role="status"></p><section id="navigation" hidden><button id="guide-start" class="primary">Navigation im Atlas starten</button><details><summary>Mit Google Maps fahren</summary><div id="navigation-links"></div><p>Google Maps führt dich über deine Wegpunkte und berechnet den Straßenverlauf selbst. Beim App-Wechsel kann die Atlas-Aufnahme pausieren.</p></details></section><small>Die Ortssuche sendet den Suchtext an Photon. Die Berechnung sendet die gewählten Punkte an OSRM und verwendet das Pkw-Straßenprofil.</small></section>
         <section id="werkstatt-panel" hidden><h1>Werkstatt</h1><p>Prüfe Standortfreigabe und Display-Wachhalten vor deiner Fahrt.</p><p><label><input id="motion" type="checkbox"> Wolken animieren</label></p><button class="primary" id="check">Einstellungen testen</button><p id="check-result" role="status"></p></section>
         <section id="fahrten" aria-labelledby="rides-title">
           <h2 id="rides-title">Deine Fahrten</h2>

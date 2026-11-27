@@ -36,3 +36,10 @@ body[data-view="plan"] .fog,body[data-view="plan"] .legend {visibility:hidden}
 @media(max-width:760px){body[data-view="plan"] .sidebar{grid-row:1}body[data-view="plan"] .map-panel{grid-row:2}}
 
 #navigation-links a {display:block;text-align:center;text-decoration:none;margin:.5rem 0}
+#guidance {position:absolute;z-index:700;top:.7rem;left:.7rem;right:.7rem;max-width:33rem;padding:1rem;background:#142937;color:#fff5df;border:2px solid #e9bb69;border-radius:.7rem}
+#guidance strong,#guidance small {display:block;margin-bottom:.4rem}
+#guidance strong {font-size:1.3rem}
+.guiding .sidebar,.guiding .map-controls,.guiding .leaflet-control-zoom {display:none}
+.guiding .atlas {display:block}
+.guiding .map-panel {height:calc(100svh - 68px);min-height:340px}
+#navigation summary {padding:12px 0;cursor:pointer}
