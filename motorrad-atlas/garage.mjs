@@ -83,6 +83,7 @@ export function setupGarage(atlas) {
       item.textContent = label + ' · ' + (point.name || point.lat.toFixed(3) + '°, ' + point.lng.toFixed(3) + '°');
       stops.append(item);
     });
+    byId('ride-live').disabled = points.length < 2;
     byId('calculate').disabled = points.length < 2;
     byId('undo').disabled = !points.length;
     byId('route-result').textContent = '';
@@ -171,6 +172,18 @@ export function setupGarage(atlas) {
     } finally {
       clearTimeout(timeout);
       if (controller === request) byId('calculate').disabled = points.length < 2;
+    }
+  };
+  byId('ride-live').onclick = () => {
+    if (document.getElementById('record').getAttribute('aria-pressed') === 'true') {
+      byId('route-result').textContent = 'Beende zuerst die laufende Aufzeichnung. Die Ferrostar-Fahransicht öffnet sich auf einer eigenen Seite.';
+      return;
+    }
+    try {
+      sessionStorage.setItem('atlas-live-waypoints',JSON.stringify(points));
+      location.assign('./ferrostar-test/?fahrt=live');
+    } catch {
+      byId('route-result').textContent = 'Der Browser konnte die Wegpunkte nicht übernehmen.';
     }
   };
   byId('calculate').onclick = calculate;

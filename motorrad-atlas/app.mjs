@@ -1,4 +1,4 @@
-import { setupGarage } from './garage.mjs?v=atlasnav3';
+import { setupGarage } from './garage.mjs?v=ferrolive4';
 import { createAtlas } from './atlas.mjs?v=garage1';
 import { DEMO_RIDE, parseBackup, parseGpx } from './formats.mjs';
 import { checkedFix } from './gps.mjs';

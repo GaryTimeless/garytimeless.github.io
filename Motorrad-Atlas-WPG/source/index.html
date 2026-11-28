@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="de" data-theme="night">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07090f">
+  <meta name="color-scheme" content="dark light">
+  <title>Motorrad-Atlas WPG · Fahr die Wolken weg</title>
+  <link rel="stylesheet" href="%BASE_URL%vendor/leaflet.css">
+  <link rel="stylesheet" href="./style.css">
+  <script src="%BASE_URL%vendor/leaflet.js"></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body data-view="ride">
+  <div id="map" aria-label="Entdeckerkarte"></div>
+
+  <header class="topbar glass">
+    <a class="brand" href="#ride" aria-label="Motorrad-Atlas Start">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 21c4-1 6-8 10-8s5 6 10 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="26" cy="17" r="2.4" fill="currentColor"/></svg>
+      <span>Motorrad<b>Atlas WPG</b></span>
+    </a>
+    <div class="explored" title="Fläche, die du schon gefahren bist">
+      <span class="explored-ring" id="explored-ring" style="--p:0"></span>
+      <span><strong id="explored-km2">0</strong><small>km² entdeckt</small></span>
+    </div>
+    <button class="icon-btn" id="theme-toggle" aria-label="Tag- oder Nachtmodus">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/><g class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 1.8v2.6M12 19.6v2.6M1.8 12h2.6M19.6 12h2.6M4.8 4.8l1.8 1.8M17.4 17.4l1.8 1.8M4.8 19.2l1.8-1.8M17.4 6.6l1.8-1.8"/></g></svg>
+    </button>
+  </header>
+
+  <div class="map-fabs">
+    <button class="fab glass" id="germany" aria-label="Ganz Deutschland zeigen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button class="fab glass" id="fit" aria-label="Alle Spuren zeigen" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c3-1 4-7 8-7s4 6 10 4"/><circle cx="3" cy="17" r="1.6"/><circle cx="21" cy="14" r="1.6"/></svg></button>
+    <button class="fab glass" id="locate" aria-label="Zu meinem Standort"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg></button>
+  </div>
+
+  <!-- Live HUD: huge, glanceable numbers while recording. -->
+  <section class="hud" id="hud" hidden aria-live="off">
+    <div class="hud-speed"><strong id="hud-speed">0</strong><small>km/h</small><button id="hud-stop" class="chip">Fahrt beenden</button></div>
+    <div class="hud-row">
+      <div><strong id="hud-km">0,0</strong><small>km</small></div>
+      <div><strong id="hud-time">0:00</strong><small>Fahrzeit</small></div>
+      <div><strong id="hud-gps">–</strong><small>Genauigkeit m</small></div>
+    </div>
+  </section>
+
+  <aside class="sheet glass" id="sheet">
+    <button class="sheet-handle" id="sheet-handle" aria-label="Bereich ein- oder ausklappen" aria-expanded="true"><span></span></button>
+    <div class="sheet-body">
+
+      <!-- RIDE -->
+      <section class="panel" data-panel="ride" aria-labelledby="ride-title">
+        <p class="eyebrow" id="ride-eyebrow">Bereit</p>
+        <h1 id="ride-title">Fahr die Wolken weg.</h1>
+        <p class="lede" id="ride-lede">Jede Strecke, die du fährst, reißt die Wolkendecke auf. Was frei ist, hast du selbst erfahren.</p>
+        <button id="record" class="ride-button" aria-pressed="false">
+          <span class="ride-button-dot" aria-hidden="true"></span>
+          <span id="record-label">Fahrt starten</span>
+        </button>
+        <p id="status" class="status" role="status">Bereit für deine erste Tour.</p>
+        <div class="quick" id="quick">
+          <button class="quick-btn" data-quick="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span><strong>Nach Hause</strong><small id="quick-home-sub">Festlegen</small></span></button>
+          <button class="quick-btn" data-quick="work"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5h6v2.5M3.5 12.5h17"/></svg><span><strong>Zur Arbeit</strong><small id="quick-work-sub">Festlegen</small></span></button>
+        </div>
+        <button class="cta secondary where-to" id="where-to"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg>Wohin? Ziel suchen</button>
+        <div class="chip-row">
+          <button id="demo" class="chip" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg><span id="demo-label">Beispieltour abspielen</span></button>
+          <button id="import" class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>GPX importieren</button>
+        </div>
+        <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden>
+      </section>
+
+      <!-- PLAN / NAVIGATE -->
+      <section class="panel" data-panel="plan" aria-labelledby="plan-title" hidden>
+        <p class="eyebrow">Navigation</p>
+        <h1 id="plan-title">Wohin geht's?</h1>
+        <div class="fav-row" id="fav-row" aria-label="Favoriten"></div>
+        <ol id="stops" class="stops" aria-label="Wegpunkte"></ol>
+        <div class="chip-row stop-tools">
+          <button class="chip" id="add-via"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Zwischenziel</button>
+          <button class="chip" id="swap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg>Tauschen</button>
+          <button class="chip" id="clear-route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>Leeren</button>
+        </div>
+        <p class="lede" id="plan-empty">Gib einen Ort ein, zum Beispiel eine Stadt, eine Adresse, eine Tankstelle oder einen Pass. Du kannst auch direkt auf die Karte tippen und die Punkte verschieben.</p>
+        <label class="switch"><input type="checkbox" id="avoid-motorways"><span class="track" aria-hidden="true"></span><span>Autobahnen meiden</span></label>
+        <div class="route-card" id="route-card" hidden>
+          <div><strong id="route-km">0</strong><small>km</small></div>
+          <div><strong id="route-time">–</strong><small>Fahrzeit</small></div>
+          <div><strong id="route-arrival">–</strong><small>Ankunft</small></div>
+          <div class="route-new"><strong id="route-new">–</strong><small>der Strecke bist du noch nie gefahren</small><span class="bar" id="route-new-bar" style="--p:0"></span></div>
+          <p class="route-note" id="route-note"></p>
+        </div>
+        <div class="remember" id="remember" hidden>
+          <button class="chip" data-remember="home" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/></svg><span>Als Zuhause merken</span></button>
+          <button class="chip" data-remember="work" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5h6v2.5"/></svg><span>Als Arbeit merken</span></button>
+        </div>
+        <p class="fineprint">Die Live-Fahransicht berechnet deine Wegpunkte mit Valhalla ab dem GPS-Standort neu. Während der Navigation wird keine Fahrt im Atlas gespeichert.</p>
+        <p id="route-result" class="status" role="status"></p>
+        <button class="ride-button nav-go" id="start-nav" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 19-7-4-7 4z" class="fill"/></svg>
+          <span>Mit Ferrostar fahren</span>
+        </button>
+        <label class="switch" hidden><input type="checkbox" id="nav-record"><span class="track" aria-hidden="true"></span><span>Fahrt mitschreiben, damit die Wolken verschwinden</span></label>
+        <div class="chip-row">
+          <button class="chip" id="simulate-nav" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>Probefahrt ansehen</button>
+          <button class="chip" id="export-gpx" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M5 14v6h14v-6"/></svg>Für Garmin &amp; Co. speichern</button>
+        </div>
+        <details class="about">
+          <summary>Gut zu wissen</summary>
+          <p>Die Route ist für Straßen allgemein berechnet, nicht speziell für kurvige Motorradstrecken. Fahrzeit und Ankunft sind Schätzungen.</p>
+          <p>„Für Garmin &amp; Co. speichern“ erzeugt eine GPX-Datei. Die Datei kann heruntergeladen oder bei Geräteunterstützung geteilt werden. Import in Garmin, Calimoto und Kurviger ist noch nicht geprüft.</p>
+          <p class="fineprint">Technik: Ortssuche mit Photon (komoot), Route mit dem öffentlichen OSRM-Dienst, beides auf Basis von OpenStreetMap. Diese Dienste sind für wenige Nutzer gedacht. Für eine veröffentlichte App braucht es eigene Server.</p>
+        </details>
+      </section>
+
+      <!-- LOGBOOK -->
+      <section class="panel" data-panel="log" aria-labelledby="log-title" hidden>
+        <p class="eyebrow">Fahrtenbuch</p>
+        <h1 id="log-title">Deine Spuren</h1>
+        <div class="odo" aria-label="Gesamtkilometer"><span id="odo">000000</span><small>km gesamt</small></div>
+        <dl class="tiles">
+          <div><dt>Touren</dt><dd id="ride-count">0</dd></div>
+          <div><dt>Ø je Tour</dt><dd id="average-distance">–</dd></div>
+          <div><dt>Ø in Bewegung</dt><dd id="average-speed">–</dd></div>
+          <div><dt>Erdumfang <span id="year"></span></dt><dd id="year-progress">0 %</dd></div>
+        </dl>
+        <h2>Abzeichen</h2>
+        <ul class="badges" id="badges"></ul>
+        <h2>Touren</h2>
+        <p id="empty" class="lede">Noch keine Fahrt gespeichert. Starte deine erste Aufnahme oder importiere eine GPX-Datei.</p>
+        <ul id="rides" class="rides"></ul>
+      </section>
+
+      <!-- GARAGE / SETTINGS -->
+      <section class="panel" data-panel="garage" aria-labelledby="garage-title" hidden>
+        <p class="eyebrow">Garage</p>
+        <h1 id="garage-title">Einstellungen</h1>
+        <fieldset class="segmented">
+          <legend>Darstellung</legend>
+          <label><input type="radio" name="theme" value="auto"><span>Auto</span></label>
+          <label><input type="radio" name="theme" value="day"><span>Tag</span></label>
+          <label><input type="radio" name="theme" value="night"><span>Nacht</span></label>
+        </fieldset>
+        <h2>Meine Orte</h2>
+        <div class="places" id="places"></div>
+        <fieldset class="segmented">
+          <legend>Wie breit die Wolken links und rechts der Straße verschwinden</legend>
+          <label><input type="radio" name="reveal" value="150"><span>150 m</span></label>
+          <label><input type="radio" name="reveal" value="200"><span>200 m</span></label>
+          <label><input type="radio" name="reveal" value="300"><span>300 m</span></label>
+        </fieldset>
+        <label class="switch"><input type="checkbox" id="voice-pref"><span class="track" aria-hidden="true"></span><span>Sprachansagen bei Navigation</span></label>
+        <button class="chip" id="voice-test">Ansage probehören (z. B. im Helm)</button>
+        <label class="switch"><input type="checkbox" id="motion"><span class="track" aria-hidden="true"></span><span>Wolken animieren</span></label>
+        <button class="cta secondary" id="check">Ist mein Handy bereit?</button>
+        <ul class="checks" id="check-result" role="status"></ul>
+        <h2>Sicherung</h2>
+        <p class="fineprint">Fahrten und Favoriten werden lokal gespeichert. Die Sicherung enthält nur abgeschlossene Fahrten, keine Favoriten oder laufende Aufnahme. Suche, Karten und Routing übertragen Anfragen an externe Dienste.</p>
+        <div class="chip-row">
+          <button id="export" class="chip">Sicherung speichern</button>
+          <button id="restore" class="chip">Sicherung einlesen</button>
+        </div>
+        <input id="backup-file" type="file" accept=".json,application/json" hidden>
+      </section>
+    </div>
+
+    <nav class="dock" aria-label="Hauptbereiche">
+      <a href="#ride" data-tab="ride"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" class="fill"/></svg><span>Fahrt</span></a>
+      <a href="#plan" data-tab="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c2-6 5-2 7-8s5-5 7-6"/><circle cx="5" cy="19" r="2"/><path d="M19 3v4M17 5h4"/></svg><span>Navi</span></a>
+      <a href="#log" data-tab="log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Fahrtenbuch</span></a>
+      <a href="#garage" data-tab="garage"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Garage</span></a>
+    </nav>
+  </aside>
+
+  <!-- NAVIGATION HUD -->
+  <section class="nav" id="nav" aria-label="Navigation">
+    <div class="nav-card" id="nav-card" role="status" aria-live="polite">
+      <div class="nav-icon" id="nav-icon" aria-hidden="true"></div>
+      <div class="nav-text">
+        <strong class="nav-dist" id="nav-dist"></strong>
+        <span class="nav-action" id="nav-action"></span>
+        <span class="nav-road" id="nav-road"></span>
+      </div>
+      <span class="nav-sim" id="nav-sim-badge" hidden>Probefahrt</span>
+    </div>
+    <p class="nav-then" id="nav-then" hidden></p>
+    <p class="nav-offroute" id="nav-offroute" hidden></p>
+    <button class="nav-recenter glass" id="nav-recenter" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 19-7-4-7 4z" class="fill"/></svg>Mir folgen</button>
+    <div class="nav-bar glass">
+      <div class="nav-speed"><strong id="nav-speed">–</strong><small>km/h</small></div>
+      <div class="nav-eta">
+        <strong id="nav-arrival">–</strong>
+        <small><span id="nav-left">–</span> · <span id="nav-remaining">–</span></small>
+      </div>
+      <button class="nav-btn" id="nav-voice" aria-pressed="true" aria-label="Sprachansagen ausschalten">
+        <svg viewBox="0 0 24 24" class="i-on" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+        <svg viewBox="0 0 24 24" class="i-off" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+      </button>
+      <button class="nav-btn" id="nav-overview" aria-label="Ganze Route zeigen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="nav-end" id="nav-end">Beenden</button>
+    </div>
+  </section>
+
+  <section id="ferrostar-panel" hidden aria-label="Live-Navigation – Entwicklungsstand">
+    <p id="ferrostar-status" role="status"></p>
+    <div id="ferrostar-host"></div>
+    <div class="ferrostar-actions">
+      <button id="ferrostar-voice" class="chip" aria-pressed="false">Ansagen ein/aus</button>
+      <button id="ferrostar-end" class="chip">Zurück zum Atlas</button>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="onboarding" class="glass">
+    <p class="eyebrow">Willkommen</p>
+    <h2>Deutschland liegt unter Wolken.</h2>
+    <p>Tippe beim Losfahren auf „Fahrt starten“. Wo du fährst, verschwinden die Wolken. So siehst du auf einen Blick, welche Straßen du schon kennst und wo noch Neues auf dich wartet.</p>
+    <form method="dialog" class="dialog-actions">
+      <button class="cta" value="demo">Beispieltour ansehen</button>
+      <button class="chip" value="close">Direkt loslegen</button>
+    </form>
+  </dialog>
+
+  <dialog id="rename-dialog" class="glass">
+    <form method="dialog">
+      <h2>Tour benennen</h2>
+      <label class="field"><span>Name</span><input id="rename-input" maxlength="60" autocomplete="off"></label>
+      <div class="dialog-actions">
+        <button class="cta" value="save">Speichern</button>
+        <button class="chip" value="delete" id="delete-ride">Tour löschen</button>
+        <button class="chip" value="cancel" formnovalidate>Abbrechen</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

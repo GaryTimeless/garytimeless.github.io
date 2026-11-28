@@ -1,0 +1,23 @@
+{
+  "name": "motorrad-atlas-ferrostar-prototype",
+  "version": "2.3.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test *.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "@stadiamaps/ferrostar-webcomponents": "0.58.0"
+  },
+  "devDependencies": {
+    "vite": "6.1.0",
+    "vite-plugin-wasm": "3.4.1",
+    "vite-plugin-top-level-await": "1.5.0"
+  }
+}

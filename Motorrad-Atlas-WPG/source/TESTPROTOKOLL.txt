@@ -1,0 +1,246 @@
+Runtime: v18.4.0
+
+track.test.mjs exit=0
+TAP version 13
+ok 1 - distanceMeters uses the haversine formula
+  ---
+  duration_ms: 0.00039661
+  ...
+ok 2 - splitTrack starts a new segment before a breakBefore point
+  ---
+  duration_ms: 0.000480112
+  ...
+ok 3 - splitTrack splits only when the time gap is more than 20 seconds
+  ---
+  duration_ms: 0.000061301
+  ...
+ok 4 - splitTrack does not split an interval with a missing timestamp
+  ---
+  duration_ms: 0.000081902
+  ...
+ok 5 - summarize keeps distance and movement inside segments
+  ---
+  duration_ms: 0.000151904
+  ...
+ok 6 - summarize counts timed movement only at 5 km/h or faster
+  ---
+  duration_ms: 0.000075302
+  ...
+ok 7 - summarize sums distance but reports no timing when times are missing
+  ---
+  duration_ms: 0.000071402
+  ...
+1..7
+# tests 7
+# pass 7
+# fail 0
+# skipped 0
+# todo 0
+# duration_ms 0.036129105
+(node:5024) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+nav.test.mjs exit=0
+TAP version 13
+ok 1 - OSRM steps become German instructions
+  ---
+  duration_ms: 0.000537714
+  ...
+ok 2 - via points inside a multi-leg route become waypoint steps
+  ---
+  duration_ms: 0.001074427
+  ...
+ok 3 - tracker measures distance to the next turn and remaining distance
+  ---
+  duration_ms: 0.000478612
+  ...
+ok 4 - tracker detects leaving the route and arriving
+  ---
+  duration_ms: 0.000266507
+  ...
+ok 5 - a ride along the route speaks each prompt once, in order
+  ---
+  duration_ms: 0.001225731
+  ...
+ok 6 - distances are rounded for glanceable reading
+  ---
+  duration_ms: 0.013106928
+  ...
+ok 7 - photon features become readable places
+  ---
+  duration_ms: 0.000298807
+  ...
+1..7
+# tests 7
+# pass 7
+# fail 0
+# skipped 0
+# todo 0
+# duration_ms 0.071810798
+(node:5031) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+favorites.test.mjs exit=0
+TAP version 13
+ok 1 - favourites are stored without extra fields and can be cleared
+  ---
+  duration_ms: 0.000775819
+  ...
+ok 2 - broken storage gives empty favourites
+  ---
+  duration_ms: 0.000164204
+  ...
+ok 3 - typing a favourite name suggests it, only if it is set
+  ---
+  duration_ms: 0.000159304
+  ...
+ok 4 - a planned route becomes a GPX file with stops and the full track
+  ---
+  duration_ms: 0.008083902
+  ...
+1..4
+# tests 4
+# pass 4
+# fail 0
+# skipped 0
+# todo 0
+# duration_ms 0.058290759
+(node:5038) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+explore.test.mjs exit=0
+TAP version 13
+ok 1 - a straight 10 km ride explores roughly 10 km × 0.4 km
+  ---
+  duration_ms: 0.000923123
+  ...
+ok 2 - riding the same road twice does not count twice
+  ---
+  duration_ms: 0.000357909
+  ...
+ok 3 - gaps between segments stay unexplored
+  ---
+  duration_ms: 0.000079502
+  ...
+ok 4 - badges unlock from totals
+  ---
+  duration_ms: 0.000554614
+  ...
+ok 5 - mercator projection round-trips latitude
+  ---
+  duration_ms: 0.000156004
+  ...
+ok 6 - track index finds points within the reveal radius only
+  ---
+  duration_ms: 0.000323508
+  ...
+1..6
+# tests 6
+# pass 6
+# fail 0
+# skipped 0
+# todo 0
+# duration_ms 0.043406887
+(node:5045) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+integration.test.mjs exit=0
+TAP version 13
+ok 1 - roundtrip not arrived at start
+  ---
+  duration_ms: 0.000879422
+  ...
+ok 2 - roundtrip final maneuver follows via
+  ---
+  duration_ms: 0.000158704
+  ...
+ok 3 - simulation traverses overlapping return leg
+  ---
+  duration_ms: 0.000238606
+  ...
+ok 4 - live disabled until integration validation
+  ---
+  duration_ms: 0.000241206
+  ...
+ok 5 - live adapter never drops via points
+  ---
+  duration_ms: 0.000090103
+  ...
+ok 6 - live adapter never discards motorway preference
+  ---
+  duration_ms: 0.000037001
+  ...
+ok 7 - live plan returns copied destination
+  ---
+  duration_ms: 0.000499412
+  ...
+ok 8 - session cancellation invalidates late answers
+  ---
+  duration_ms: 0.000097002
+  ...
+ok 9 - request starts respect shared interval
+  ---
+  duration_ms: 0.080742721
+  ...
+ok 10 - aborted queued work never reaches network
+  ---
+  duration_ms: 0.001253832
+  ...
+ok 11 - motorway error makes exactly one request; no unsafe fallback
+  ---
+  duration_ms: 0.000371209
+  ...
+1..11
+# tests 11
+# pass 11
+# fail 0
+# skipped 0
+# todo 0
+# duration_ms 0.125932253
+(node:5052) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+pre-pitch.regression.test.mjs exit=1
+TAP version 13
+ok 1 - F01: roundtrip must not arrive at its starting point before riding
+  ---
+  duration_ms: 0.000645916
+  ...
+ok 2 - F01: repeated coordinate must not move final maneuver behind intermediate stop
+  ---
+  duration_ms: 0.000216506
+  ...
+not ok 3 - F02: failed reroute must preserve every still-unvisited target on retry
+  ---
+  duration_ms: 0.010582365
+  failureType: 'testCodeFailure'
+  error: 'Expected two rerouting attempts'
+  code: 'ERR_ASSERTION'
+  stack: |-
+    TestContext.<anonymous> (<module>:76:12)
+    async Test.run (node:internal/test_runner/test:342:9)
+    async Test.processPendingSubtests (node:internal/test_runner/test:153:7)
+  ...
+ok 4 - F09: motorway fallback must not issue two network requests within one second
+  ---
+  duration_ms: 1.094254692
+  ...
+1..4
+# tests 4
+# pass 3
+# fail 1
+# skipped 0
+# todo 0
+# duration_ms 1.160711356
+(node:5059) ExperimentalWarning: The test runner is an experimental feature. This feature could change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+JavaScript syntax errors: []
+
+NOT RUN: npm install, Vite build, actual Ferrostar WASM, browser, GPS, live service, device tests. npm/network retrieval is not available in this environment. Own module tests use data-URL imports from exact packaged source; no downloaded SDK or browser mock test claimed.
