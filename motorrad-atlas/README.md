@@ -60,3 +60,9 @@ Im Routenplaner setzt „Mein Standort als Start“ den Startpunkt nach Standort
 Start und Ziel lassen sich beide als Text suchen. Nach der Berechnung öffnet „Navigation in Google Maps starten“ die Abbiegenavigation mit den geplanten Wegpunkten. Google Maps berechnet die Straßenführung selbst. Bei mehr als drei Zwischenstopps stehen überlappende Etappen zur Auswahl. Liegt der geplante Start entfernt vom tatsächlichen Standort, kann Maps zunächst die Vorschau zeigen.
 
 Mit **Navigation im Atlas starten** bleibt die Route im Browser. Die Karte folgt dem GPS-Standort und zeigt Entfernung und Richtung des nächsten Manövers. Für Live-Hinweise braucht der Atlas die Standortfreigabe und einen sichtbaren Browser. Außerhalb der Strecke meldet er die Abweichung. Für eine andere Strecke den Plan anpassen und neu berechnen. Ältere gespeicherte Pläne laden beim ersten Navigationsstart die Abbiegeschritte nach.
+
+## Ferrostar-Testfahrt
+
+Unter `ferrostar-test/` läuft eine getrennte Browserprobe mit Ferrostar 0.58.0 und MapLibre. „Testfahrt starten“ simuliert eine Motorradfahrt durch Karlsruhe mit vierfacher Geschwindigkeit. Die Kamera folgt der Fahrtrichtung. Reststrecke, Ankunftszeit und Manöver stammen aus dem Ferrostar-Navigationszustand. Optional verwendet die Web-Komponente die Sprachsynthese des Browsers.
+
+Die Beispielroute wurde einmal mit dem Motorradprofil von Valhalla auf Grundlage von OpenStreetMap berechnet und lokal mitgeliefert. Die Grundkarte lädt OSM-Kacheln online. Die Testseite verarbeitet simulierte Positionen. Für einen Neuaufbau im Ordner `ferrostar-test/source` zuerst `npm ci`, dann `npx vite build` ausführen. Das Ergebnis steht unter `dist`.

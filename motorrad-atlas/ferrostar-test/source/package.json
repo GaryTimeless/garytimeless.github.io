@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@stadiamaps/ferrostar-webcomponents": "^0.58.0",
+    "maplibre-gl": "^5.24.1",
+    "vite": "^8.4.0",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
+  }
+}
